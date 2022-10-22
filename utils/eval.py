@@ -1,4 +1,5 @@
 from torch import nn
+import torch
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from datasets import SRdataset
 from models import SRmodel
@@ -38,7 +39,7 @@ if __name__ == '__main__':
  
     # 加载模型SRResNet
     checkpoint = torch.load(srresnet_checkpoint)
-    srresnet = SRResNet(large_kernel_size=large_kernel_size,
+    srresnet = SRmodel(large_kernel_size=large_kernel_size,
                         small_kernel_size=small_kernel_size,
                         n_channels=n_channels,
                         n_blocks=n_blocks,
@@ -57,7 +58,7 @@ if __name__ == '__main__':
         print("\n数据集 %s:\n" % test_data_name)
 
         # 定制化数据加载器
-        test_dataset = SRDataset(data_folder,
+        test_dataset = SRdataset(data_folder,
                                 split='test',
                                 crop_size=0,
                                 scaling_factor=4,

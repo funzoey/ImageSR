@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+from torch import nn
 class SRResNet(nn.Module):
     """
     SRResNet模型
