@@ -3,8 +3,8 @@ import torch
 from torch import nn
 from torchvision.utils import make_grid
 from torch.utils.tensorboard import SummaryWriter
-from models import SRResNet
-from datasets import SRDataset
+from models import SRmodel
+from datasets import SRdataset
 from utils import *
  
  
@@ -12,7 +12,7 @@ from utils import *
 data_folder = './data/'          # 数据存放路径
 crop_size = 96      # 高分辨率图像裁剪尺寸
 scaling_factor = 4  # 放大比例
- 
+
 # 模型参数
 large_kernel_size = 9   # 第一层卷积和最后一层卷积的核大小
 small_kernel_size = 3   # 中间层卷积的核大小
