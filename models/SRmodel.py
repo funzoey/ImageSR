@@ -12,7 +12,7 @@ class SRResNet(nn.Module):
         :参数 n_blocks: 残差模块数
         :参数 scaling_factor: 放大比例
         """
-        super(SRResNet, self).__init__()
+        super().__init__()
  
         # 放大比例必须为 2、 4 或 8
         scaling_factor = int(scaling_factor)
