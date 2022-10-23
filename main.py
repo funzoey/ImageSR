@@ -5,7 +5,7 @@ from torchvision.utils import make_grid
 from torch.utils.tensorboard import SummaryWriter
 from models import SRmodel
 from datasets import SRdataset
-from utils import *
+from utils.averagemeter import AverageMeter
  
  
 # 数据集参数
@@ -65,7 +65,7 @@ def main():
         model = nn.DataParallel(model, device_ids=list(range(ngpu)))
  
     # 定制化的dataloaders
-    train_dataset = SRDataset(data_folder,split='train',
+    train_dataset = SRdataset(data_folder,split='train',
                               crop_size=crop_size,
                               scaling_factor=scaling_factor,
                               lr_img_type='imagenet-norm',

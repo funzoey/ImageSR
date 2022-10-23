@@ -11,7 +11,7 @@ class SRDataset(Dataset):
     数据集加载器
     """
  
-    def __init__(self, data_folder, split, crop_size, scaling_factor, lr_img_type, hr_img_type, test_data_name=None):
+    def __init__(self, split, crop_size, scaling_factor, test_data_name=None):
         """
         :参数 data_folder: # Json数据文件所在文件夹路径
         :参数 split: 'train' 或者 'test'
@@ -22,19 +22,16 @@ class SRDataset(Dataset):
         :参数 test_data_name: 如果是评估阶段，则需要给出具体的待评估数据集名称，例如 "Set14"
         """
  
-        self.data_folder = data_folder
         self.split = split.lower()
         self.crop_size = int(crop_size)
         self.scaling_factor = int(scaling_factor)
-        self.lr_img_type = lr_img_type
-        self.hr_img_type = hr_img_type
+
         self.test_data_name = test_data_name
  
         assert self.split in {'train', 'test'}
         if self.split == 'test' and self.test_data_name is None:
             raise ValueError("请提供测试数据集名称!")
-        assert lr_img_type in {'[0, 255]', '[0, 1]', '[-1, 1]', 'imagenet-norm'}
-        assert hr_img_type in {'[0, 255]', '[0, 1]', '[-1, 1]', 'imagenet-norm'}
+
  
         # 如果是训练，则所有图像必须保持固定的分辨率以此保证能够整除放大比例
         # 如果是测试，则不需要对图像的长宽作限定
@@ -43,18 +40,18 @@ class SRDataset(Dataset):
  
         # 读取图像路径
         if self.split == 'train':
-            with open(os.path.join(data_folder, 'train_images.json'), 'r') as j:
-                self.images = json.load(j)
+            # with open(os.path.join(data_folder, 'train_images.json'), 'r') as j:
+            #     self.images = json.load(j)
+            self.Himages = os.listdir('./data/DIV2K/DIV2K_train_HR')
+            self.Limages = os.listdir('./data/DIV2K/DIV2K_train_LR_bicubic/X4')
         else:
-            with open(os.path.join(data_folder, self.test_data_name + '_test_images.json'), 'r') as j:
-                self.images = json.load(j)
- 
+            # with open(os.path.join(data_folder, self.test_data_name + '_test_images.json'), 'r') as j:
+            #     self.images = json.load(j)
+            self.Limages = os.listdir('./data/DIV2K/DIV2K_test_LR_bicubic/X4')
+
         # 数据处理方式
         self.transform = Transform(split=self.split,
-                                         crop_size=self.crop_size,
-                                         scaling_factor=self.scaling_factor,
-                                         lr_img_type=self.lr_img_type,
-                                         hr_img_type=self.hr_img_type)
+                                         crop_size=self.crop_size)
  
     def __getitem__(self, i):
         """
@@ -63,13 +60,10 @@ class SRDataset(Dataset):
         :返回: 返回第i个低分辨率和高分辨率的图像对
         """
         # 读取图像
-        img = Image.open(self.images[i], mode='r')
-        img = img.convert('RGB')
-        if img.width <= 96 or img.height <= 96:
-            print(self.images[i], img.width, img.height)
-        lr_img, hr_img = self.transform(img)
- 
-        return lr_img, hr_img
+        H_img = Image.open(self.Himages[i], mode='r').convert('RGB')
+        L_img = Image.open(self.Limages[i], mode='r').convert('RGB')
+        L_img, H_img = self.transform(L_img), self.transform(H_img)
+        return L_img, H_img
  
     def __len__(self):
         """

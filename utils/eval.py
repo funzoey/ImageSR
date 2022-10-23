@@ -3,6 +3,7 @@ import torch
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from datasets import SRdataset
 from models import SRmodel
+from utils.averagemeter import AverageMeter
 import time
  
 # 模型参数
@@ -14,19 +15,7 @@ scaling_factor = 4      # 放大比例
 ngpu = 2                # GP数量
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
  
-class AverageMeter(object):
-    def __init__(self):
-        self.reset()
-    def is_empty(self):
-        return self.cnt == 0
-    def reset(self):
-        self.avg = 0.
-        self.sum = 0.
-        self.cnt = 0
-    def update(self, val, n=1):
-        self.sum += val*n
-        self.cnt += n
-        self.avg = self.sum / self.cnt
+
 
 if __name__ == '__main__':
     
@@ -87,8 +76,8 @@ if __name__ == '__main__':
                 sr_imgs = model(lr_imgs)  # (1, 3, w, h), in [-1, 1]                
  
                 # 计算 PSNR 和 SSIM
-                sr_imgs_y = convert_image(sr_imgs, source='[-1, 1]', target='y-channel').squeeze(0)  # (w, h), in y-channel
-                hr_imgs_y = convert_image(hr_imgs, source='[-1, 1]', target='y-channel').squeeze(0)  # (w, h), in y-channel
+                # sr_imgs_y = convert_image(sr_imgs, source='[-1, 1]', target='y-channel').squeeze(0)  # (w, h), in y-channel
+                # hr_imgs_y = convert_image(hr_imgs, source='[-1, 1]', target='y-channel').squeeze(0)  # (w, h), in y-channel
                 psnr = peak_signal_noise_ratio(hr_imgs_y.cpu().numpy(), sr_imgs_y.cpu().numpy(),
                                             data_range=255.)
                 ssim = structural_similarity(hr_imgs_y.cpu().numpy(), sr_imgs_y.cpu().numpy(),

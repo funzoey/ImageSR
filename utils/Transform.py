@@ -6,8 +6,7 @@ class ImageTransforms(object):
     图像变换.
     """
  
-    def __init__(self, split, crop_size, scaling_factor, lr_img_type,
-                 hr_img_type):
+    def __init__(self, split, crop_size, scaling_factor):
         """
         :参数 split: 'train' 或 'test'
         :参数 crop_size: 高分辨率图像裁剪尺寸
@@ -17,9 +16,6 @@ class ImageTransforms(object):
         """
         self.split = split.lower()
         self.crop_size = crop_size
-        self.scaling_factor = scaling_factor
-        self.lr_img_type = lr_img_type
-        self.hr_img_type = hr_img_type
  
         assert self.split in {'train', 'test'}
  
@@ -55,9 +51,5 @@ class ImageTransforms(object):
  
         # 安全性检查
         assert hr_img.width == lr_img.width * self.scaling_factor and hr_img.height == lr_img.height * self.scaling_factor
- 
-        # 转换图像
-        lr_img = convert_image(lr_img, source='pil', target=self.lr_img_type)
-        hr_img = convert_image(hr_img, source='pil', target=self.hr_img_type)
  
         return lr_img, hr_img
