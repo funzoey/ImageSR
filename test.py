@@ -5,7 +5,9 @@ from torchvision import transforms
 from datasets.SRdataset import SRDataset
 from utils.averagemeter import AverageMeter
 
-train_dataset = SRDataset(split='train', crop_size=96)
+H_images = './data/DIV2K/DIV2K_train_HR'
+L_images = './data/DIV2K/DIV2K_train_LR_bicubic/X4'
+train_dataset = SRDataset(H_images, L_images, split='train', crop_size=96, scaler=4)
 
 train_loader = torch.utils.data.DataLoader(train_dataset,
                                             batch_size=128,

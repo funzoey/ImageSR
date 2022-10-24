@@ -12,7 +12,7 @@ class SRDataset(Dataset):
     数据集加载器
     """
  
-    def __init__(self, split, crop_size):
+    def __init__(self, H_images, L_images = None, split = 'train', crop_size = 96, scaler = 4):
         """
         :参数 data_folder: # Json数据文件所在文件夹路径
         :参数 split: 'train' 或者 'test'
@@ -21,21 +21,16 @@ class SRDataset(Dataset):
  
         self.split = split.lower()
         self.crop_size = int(crop_size)
+        self.scaler = scaler
         assert self.split in {'train', 'test'}
  
         # 读取图像路径
-        if self.split == 'train':
-            # with open(os.path.join(data_folder, 'train_images.json'), 'r') as j:
-            #     self.images = json.load(j)
-            self.images = os.listdir('./data/DIV2K/DIV2K_train_HR')
-        else:
-            # with open(os.path.join(data_folder, self.test_data_name + '_test_images.json'), 'r') as j:
-            #     self.images = json.load(j)
-            self.images = os.listdir('./data/DIV2K/DIV2K_test_LR_bicubic/X4')
+        self.H_imagefolder = H_images + '/'
+        self.L_imagefolder = L_images + '/'
+        self.images = os.listdir(H_images)
 
         # 数据处理方式
-        self.transform = ImageTransforms(split=self.split,
-                                         crop_size=self.crop_size,)
+        self.transform = ImageTransforms(split=self.split, scaler = scaler)
  
     def __getitem__(self, i):
         """
@@ -45,18 +40,20 @@ class SRDataset(Dataset):
         """
         # 读取图像
         if self.split == 'train':
-            H_img = Image.open('./data/DIV2K/DIV2K_train_HR/' + self.images[i], mode='r').convert('RGB')
-            L_img = Image.open('./data/DIV2K/DIV2K_train_LR_bicubic/X4/' + self.images[i][:-4] + 'X4.png', mode='r').convert('RGB')
-            L_img = L_img.resize(H_img.size)
+            H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
+            if self.L_imagefolder:
+                L_img = Image.open(self.L_imagefolder + self.images[i][:-4] + 'X4.png', mode='r').convert('RGB')
+                L_img = L_img.resize(H_img.size)
             left = random.randint(0, H_img.width - self.crop_size)
             top = random.randint(0, H_img.height - self.crop_size)
-            L_img, H_img = self.transform(L_img, top, left), self.transform(H_img, top, left)
+            L_img = self.transform(L_img, crop_size = self.crop_size, top = top, left = left)
+            H_img = self.transform(H_img, crop_size = self.crop_size, top = top, left = left)
             return L_img, H_img
 
         else:
-            L_img = Image.open('./data/DIV2K/DIV2K_train_LR_bicubic/X4/' + self.images[i], mode='r').convert('RGB')
-            L_img = self.transform(L_img)
-            return L_img
+            H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
+
+            return self.transform(H_img)
 
     def __len__(self):
         """

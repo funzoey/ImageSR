@@ -10,6 +10,8 @@ from utils.averagemeter import AverageMeter
  
  
 # 数据集参数
+H_images = './data/DIV2K/DIV2K_train_HR'
+L_images = './data/DIV2K/DIV2K_train_LR_bicubic/X4'
 crop_size = 96      # 高分辨率图像裁剪尺寸
 
 # 模型参数
@@ -54,10 +56,8 @@ def main():
     if checkpoint is not None:
         model.load_state_dict(torch.load(checkpoint))
 
- 
     # 定制化的dataloaders
-    train_dataset = SRDataset(split='train',
-                              crop_size=crop_size)
+    train_dataset = SRDataset(H_images, L_images, split='train', crop_size=crop_size, scaler=4)
 
     train_loader = torch.utils.data.DataLoader(train_dataset,
                                                 batch_size=batch_size,
