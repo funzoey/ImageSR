@@ -1,6 +1,6 @@
 import torch.backends.cudnn as cudnn
 import torch
-import tqdm as tqdm
+from tqdm import tqdm
 from torch import nn
 from torchvision.utils import make_grid
 from torch.utils.tensorboard import SummaryWriter
@@ -39,7 +39,7 @@ def main():
     global checkpoint, writer
  
     # 初始化
-    model = SRmodel(large_kernel_size=large_kernel_size,
+    model = SRResNet(large_kernel_size=large_kernel_size,
                         small_kernel_size=small_kernel_size,
                         n_channels=n_channels,
                         n_blocks=n_blocks)
@@ -52,14 +52,11 @@ def main():
  
     # 加载预训练模型
     if checkpoint is not None:
-        checkpoint = torch.load(checkpoint)
-        start_epoch = checkpoint['epoch'] + 1
-        model.load_state_dict(checkpoint['model'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
+        model.load_state_dict(torch.load(checkpoint))
 
  
     # 定制化的dataloaders
-    train_dataset = SRdataset(split='train',
+    train_dataset = SRDataset(split='train',
                               crop_size=crop_size)
 
     train_loader = torch.utils.data.DataLoader(train_dataset,
@@ -69,7 +66,7 @@ def main():
                                                 pin_memory=True) 
  
     # 开始逐轮训练
-    for epoch in range(start_epoch, epochs+1):
+    for epoch in range(0, epochs+1):
  
         model.train()  # 训练模式：允许使用批样本归一化
         loss_epoch = AverageMeter()  # 统计损失函数

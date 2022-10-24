@@ -5,7 +5,7 @@ import json
 import os
 from PIL import Image
 from utils.Transform import ImageTransforms
- 
+import random
  
 class SRDataset(Dataset):
     """
@@ -27,16 +27,15 @@ class SRDataset(Dataset):
         if self.split == 'train':
             # with open(os.path.join(data_folder, 'train_images.json'), 'r') as j:
             #     self.images = json.load(j)
-            self.Himages = os.listdir('./data/DIV2K/DIV2K_train_HR')
-            self.Limages = os.listdir('./data/DIV2K/DIV2K_train_LR_bicubic/X4')
+            self.images = os.listdir('./data/DIV2K/DIV2K_train_HR')
         else:
             # with open(os.path.join(data_folder, self.test_data_name + '_test_images.json'), 'r') as j:
             #     self.images = json.load(j)
-            self.Limages = os.listdir('./data/DIV2K/DIV2K_test_LR_bicubic/X4')
+            self.images = os.listdir('./data/DIV2K/DIV2K_test_LR_bicubic/X4')
 
         # 数据处理方式
         self.transform = ImageTransforms(split=self.split,
-                                         crop_size=self.crop_size)
+                                         crop_size=self.crop_size,)
  
     def __getitem__(self, i):
         """
@@ -46,12 +45,16 @@ class SRDataset(Dataset):
         """
         # 读取图像
         if self.split == 'train':
-            H_img = Image.open('./data/DIV2K/DIV2K_train_HR' + self.Himages[i], mode='r').convert('RGB')
-            L_img = Image.open('./data/DIV2K/DIV2K_train_LR_bicubic/X4' + self.Limages[i], mode='r').convert('RGB')
-            L_img, H_img = self.transform(L_img), self.transform(H_img)
+            H_img = Image.open('./data/DIV2K/DIV2K_train_HR/' + self.images[i], mode='r').convert('RGB')
+            L_img = Image.open('./data/DIV2K/DIV2K_train_LR_bicubic/X4/' + self.images[i][:-4] + 'X4.png', mode='r').convert('RGB')
+            L_img = L_img.resize(H_img.size)
+            left = random.randint(0, H_img.width - self.crop_size)
+            top = random.randint(0, H_img.height - self.crop_size)
+            L_img, H_img = self.transform(L_img, top, left), self.transform(H_img, top, left)
             return L_img, H_img
+
         else:
-            L_img = Image.open('./data/DIV2K/DIV2K_train_LR_bicubic/X4' + self.Limages[i], mode='r').convert('RGB')
+            L_img = Image.open('./data/DIV2K/DIV2K_train_LR_bicubic/X4/' + self.images[i], mode='r').convert('RGB')
             L_img = self.transform(L_img)
             return L_img
 
@@ -60,4 +63,4 @@ class SRDataset(Dataset):
         为了使用PyTorch的DataLoader, 必须提供该方法.
         :返回: 加载的图像总数
         """
-        return len(self.Limages)
+        return len(self.images)

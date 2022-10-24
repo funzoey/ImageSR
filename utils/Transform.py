@@ -1,5 +1,6 @@
-import random
 from PIL import Image
+from torchvision import transforms
+import torchvision.transforms.functional as F
 
 class ImageTransforms(object):
     """
@@ -13,18 +14,18 @@ class ImageTransforms(object):
         """
         self.split = split.lower()
         self.crop_size = crop_size
- 
+        self.trans = transforms.Compose([
+            # transforms.CenterCrop ,
+            # transforms.RandomHorizontalFlip(),
+            transforms.ToTensor()
+        ])
         assert self.split in {'train', 'test'}
  
-    def __call__(self, img):
+    def __call__(self, img, top = 0, left = 0):
 
         # 裁剪
-        if self.split != None:
-            left = random.randint(1, img.width - self.crop_size)
-            top = random.randint(1, img.height - self.crop_size)
-            right = left + self.crop_size
-            bottom = top + self.crop_size
-            _img = img.crop((left, top, right, bottom))
+        if self.split == 'train':
+            _img = F.crop(img, top, left, self.crop_size, self.crop_size)
 
         # else:
         #     # 从图像中尽可能大的裁剪出能被放大比例整除的图像
@@ -36,4 +37,4 @@ class ImageTransforms(object):
         #     bottom = top + (img.height - y_remainder)
         #     hr_img = img.crop((left, top, right, bottom))
  
-        return _img
+        return self.trans(_img)

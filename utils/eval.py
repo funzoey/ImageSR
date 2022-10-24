@@ -1,8 +1,8 @@
 from torch import nn
 import torch
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-from datasets import SRdataset
-from models import SRmodel
+from datasets.SRdataset import SRDataset
+from models.SRmodel import SRResNet
 from utils.averagemeter import AverageMeter
 import time
  
@@ -20,15 +20,14 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if __name__ == '__main__':
     
     # 测试集目录
-    data_folder = "./data/"
     test_data_names = ["Set5","Set14", "BSD100"]
  
     # 预训练模型
-    srresnet_checkpoint = "./results/checkpoint_srresnet.pth"
+    srresnet_checkpoint = "./checkpoints/checkpoint_srresnet.pth"
  
     # 加载模型SRResNet
     checkpoint = torch.load(srresnet_checkpoint)
-    srresnet = SRmodel(large_kernel_size=large_kernel_size,
+    srresnet = SRResNet(large_kernel_size=large_kernel_size,
                         small_kernel_size=small_kernel_size,
                         n_channels=n_channels,
                         n_blocks=n_blocks,
@@ -47,8 +46,7 @@ if __name__ == '__main__':
         print("\n数据集 %s:\n" % test_data_name)
 
         # 定制化数据加载器
-        test_dataset = SRdataset(data_folder,
-                                split='test',
+        test_dataset = SRDataset(split='test',
                                 crop_size=0,
                                 scaling_factor=4,
                                 lr_img_type='imagenet-norm',
@@ -78,10 +76,9 @@ if __name__ == '__main__':
                 # 计算 PSNR 和 SSIM
                 # sr_imgs_y = convert_image(sr_imgs, source='[-1, 1]', target='y-channel').squeeze(0)  # (w, h), in y-channel
                 # hr_imgs_y = convert_image(hr_imgs, source='[-1, 1]', target='y-channel').squeeze(0)  # (w, h), in y-channel
-                psnr = peak_signal_noise_ratio(hr_imgs_y.cpu().numpy(), sr_imgs_y.cpu().numpy(),
-                                            data_range=255.)
-                ssim = structural_similarity(hr_imgs_y.cpu().numpy(), sr_imgs_y.cpu().numpy(),
-                                            data_range=255.)
+
+                psnr = peak_signal_noise_ratio(hr_imgs_y.cpu().numpy(), sr_imgs_y.cpu().numpy(), data_range=255.)
+                ssim = structural_similarity(hr_imgs_y.cpu().numpy(), sr_imgs_y.cpu().numpy(), data_range=255.)
                 PSNRs.update(psnr, lr_imgs.size(0))
                 SSIMs.update(ssim, lr_imgs.size(0))
  
