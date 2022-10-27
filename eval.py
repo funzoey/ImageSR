@@ -26,20 +26,20 @@ if __name__ == '__main__':
     # 测试集目录
     test_data_names = ["Set5+14", "urban100"]
  
-    # # 预训练模型
-    # srresnet_checkpoint = "./checkpoints/checkpoint_srresnet.pth"
+    # 预训练模型
+    srresnet_checkpoint = "./checkpoints/checkpoint_srresnet.pth"
  
-    # # 加载模型SRResNet
-    # srresnet = SRResNet(large_kernel_size=large_kernel_size,
-    #                     small_kernel_size=small_kernel_size,
-    #                     n_channels=n_channels,
-    #                     n_blocks=n_blocks,
-    #                     scaling_factor=scaling_factor)
-    # srresnet = srresnet.to(device)
-    # srresnet.load_state_dict(torch.load(srresnet_checkpoint))
+    # 加载模型SRResNet
+    srresnet = SRResNet(large_kernel_size=large_kernel_size,
+                        small_kernel_size=small_kernel_size,
+                        n_channels=n_channels,
+                        n_blocks=n_blocks,
+                        scaling_factor=scaling_factor)
+    srresnet = srresnet.to(device)
+    srresnet.load_state_dict(torch.load(srresnet_checkpoint))
    
-    # srresnet.eval()
-    # model = srresnet
+    srresnet.eval()
+    model = srresnet
 
 
     # 定制化数据加载器
