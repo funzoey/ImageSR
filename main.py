@@ -4,7 +4,7 @@ from tqdm import tqdm
 from torch import nn
 from torchvision.utils import make_grid
 from torch.utils.tensorboard import SummaryWriter
-from models.SRmodel import SRResNet
+from models.srresnet import SRResNet
 from datasets.SRdataset import SRDataset
 from utils.averagemeter import AverageMeter
  
@@ -24,7 +24,7 @@ n_blocks = 16           # 残差模块数量
 checkpoint = None   # 预训练模型路径，如果不存在则为None
 batch_size = 128    # 批大小
 epochs = 200        # 迭代轮数
-workers = 4         # 工作线程数
+workers = 0         # 工作线程数
 lr = 1e-4           # 学习率
  
 # 设备参数
@@ -41,10 +41,8 @@ def main():
     global checkpoint, writer
  
     # 初始化
-    model = SRResNet(large_kernel_size=large_kernel_size,
-                        small_kernel_size=small_kernel_size,
-                        n_channels=n_channels,
-                        n_blocks=n_blocks)
+    model = SRResNet()
+
     # 初始化优化器
     optimizer = torch.optim.Adam(params=filter(lambda p: p.requires_grad, model.parameters()),lr=lr)
  

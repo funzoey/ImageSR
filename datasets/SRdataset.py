@@ -26,8 +26,11 @@ class SRDataset(Dataset):
  
         # 读取图像路径
         self.H_imagefolder = H_images + '/'
-        self.L_imagefolder = L_images + '/'
+        self.L_images = None
         self.images = os.listdir(H_images)
+        if L_images:
+            self.L_imagefolder = L_images + '/'
+            self.L_images = os.listdir(L_images)
 
         # 数据处理方式
         self.transform = ImageTransforms(scaler = scaler)
@@ -41,7 +44,7 @@ class SRDataset(Dataset):
         # 读取图像
         H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
         if self.L_imagefolder:
-            L_img = Image.open(self.L_imagefolder + self.images[i], mode='r').convert('RGB')
+            L_img = Image.open(self.L_imagefolder + self.L_images[i], mode='r').convert('RGB')
             L_img = L_img.resize(H_img.size)
         else:
             L_img = None
