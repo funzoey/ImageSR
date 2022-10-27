@@ -3,7 +3,7 @@ from torch import nn
 import torch
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from datasets.SRdataset import SRDataset
-from models.SRmodel import SRResNet
+from models.srresnet import SRResNet
 from utils.averagemeter import AverageMeter
 import time
  
@@ -30,11 +30,7 @@ if __name__ == '__main__':
     srresnet_checkpoint = "./checkpoints/checkpoint_srresnet.pth"
  
     # 加载模型SRResNet
-    srresnet = SRResNet(large_kernel_size=large_kernel_size,
-                        small_kernel_size=small_kernel_size,
-                        n_channels=n_channels,
-                        n_blocks=n_blocks,
-                        scaling_factor=scaling_factor)
+    srresnet = SRResNet()
     srresnet = srresnet.to(device)
     srresnet.load_state_dict(torch.load(srresnet_checkpoint))
    

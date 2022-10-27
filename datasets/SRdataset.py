@@ -45,7 +45,7 @@ class SRDataset(Dataset):
         H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
         if self.L_imagefolder:
             L_img = Image.open(self.L_imagefolder + self.L_images[i], mode='r').convert('RGB')
-            L_img = L_img.resize(H_img.size)
+            # L_img = L_img.resize(H_img.size)
         else:
             L_img = None
 

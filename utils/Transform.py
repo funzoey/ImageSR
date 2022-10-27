@@ -21,18 +21,14 @@ class ImageTransforms(object):
  
     def __call__(self, hr_img, lr_img = None, crop_size = 0):
         if lr_img == None:
-            x_remainder = hr_img.width % self.scaler 
-            y_remainder = hr_img.height % self.scaler 
-            right = left + (hr_img.width - x_remainder)
-            bottom = top + (hr_img.height - y_remainder)
-            hr_img = hr_img.crop((left, top, right, bottom))
-            lr_img = hr_img.resize((int(hr_img.width / self.scaler), int(hr_img.height / self.scaler)), Image.BICUBIC).resize(hr_img.size)
+            lr_img = hr_img.resize((int(hr_img.width / self.scaler), int(hr_img.height / self.scaler)), Image.BICUBIC)
+            
         # 裁剪
         if crop_size != 0:
-            left = random.randint(0, hr_img.width - crop_size)
-            top = random.randint(0, hr_img.height - crop_size)
-            hr_img = F.crop(hr_img, top, left, crop_size, crop_size)
+            left = random.randint(0, lr_img.width - crop_size)
+            top = random.randint(0, lr_img.height - crop_size)
             lr_img = F.crop(lr_img, top, left, crop_size, crop_size)
+            hr_img = F.crop(hr_img, top * self.scaler, left * self.scaler, crop_size * self.scaler, crop_size * self.scaler)
 
         return self.trans(lr_img), self.trans(hr_img)
         
