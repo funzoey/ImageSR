@@ -24,7 +24,7 @@ n_blocks = 16           # 残差模块数量
 checkpoint = None   # 预训练模型路径，如果不存在则为None
 batch_size = 128    # 批大小
 epochs = 200        # 迭代轮数
-workers = 0         # 工作线程数
+workers = 4         # 工作线程数
 lr = 1e-4           # 学习率
  
 # 设备参数
