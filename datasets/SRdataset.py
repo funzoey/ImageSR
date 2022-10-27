@@ -5,7 +5,7 @@ import json
 import os
 from PIL import Image
 from utils.Transform import ImageTransforms
-import random
+
  
 class SRDataset(Dataset):
     """
@@ -30,7 +30,7 @@ class SRDataset(Dataset):
         self.images = os.listdir(H_images)
 
         # 数据处理方式
-        self.transform = ImageTransforms(split=self.split, scaler = scaler)
+        self.transform = ImageTransforms(scaler = scaler)
  
     def __getitem__(self, i):
         """
@@ -39,21 +39,19 @@ class SRDataset(Dataset):
         :返回: 返回第i个低分辨率和高分辨率的图像对
         """
         # 读取图像
-        if self.split == 'train':
-            H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
-            if self.L_imagefolder:
-                L_img = Image.open(self.L_imagefolder + self.images[i][:-4] + 'X4.png', mode='r').convert('RGB')
-                L_img = L_img.resize(H_img.size)
-            left = random.randint(0, H_img.width - self.crop_size)
-            top = random.randint(0, H_img.height - self.crop_size)
-            L_img = self.transform(L_img, crop_size = self.crop_size, top = top, left = left)
-            H_img = self.transform(H_img, crop_size = self.crop_size, top = top, left = left)
-            return L_img, H_img
-
+        H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
+        if self.L_imagefolder:
+            L_img = Image.open(self.L_imagefolder + self.images[i], mode='r').convert('RGB')
+            L_img = L_img.resize(H_img.size)
         else:
-            H_img = Image.open(self.H_imagefolder + self.images[i], mode='r').convert('RGB')
+            L_img = None
 
-            return self.transform(H_img)
+        if self.split == 'train':
+            return self.transform(hr_img = H_img, lr_img = L_img, crop_size=self.crop_size)
+        else:
+            return self.transform(hr_img = H_img, lr_img = L_img)
+
+        
 
     def __len__(self):
         """

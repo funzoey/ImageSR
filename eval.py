@@ -48,7 +48,7 @@ if __name__ == '__main__':
             test_dataset = SRDataset(H_images='./data/test/Set5+14/original', L_images='./data/test/Set5+14/LRbicx4', split='test', crop_size=0, scaler=4)
         else:
             test_dataset = SRDataset(H_images = './data/test/urban100', split='test', crop_size=0)
-        test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=16, shuffle=False, num_workers=0, pin_memory=True)
+        test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=0, pin_memory=True)
 
         # 记录每个样本 PSNR 和 SSIM值
         PSNRs = 0.0
